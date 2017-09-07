@@ -113,3 +113,15 @@ h1 {
     animation:fade 3000ms infinite;
     -webkit-animation:fade 3000ms infinite;
 }
+
+#overlay{
+    position: absolute;
+    top: 0px;
+    left:0px;
+}
+
+#container{
+    position: relative;
+    width: 500px;
+    height: 500px;
+}

@@ -15345,10 +15345,7 @@ document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
     document.getElementById('openCamera').addEventListener('click',openCamera,false);
     document.getElementById('openLibrary').addEventListener('click',openFilePicker,false);
-    document.getElementById('faceDetect').addEventListener('click',faceDetect,false);
-   
-
-    
+    document.getElementById('faceDetect').addEventListener('click',faceDetect,false);    
 }
 
 var cc = document.getElementById('image').getContext('2d');
@@ -15358,12 +15355,10 @@ var ctrack = new clm.tracker({stopOnConvergence : true});
 ctrack.init();
 
 
-
-
 function setOptions(srcType) {
     var options = {
         // Some common settings are 20, 50, and 100
-        quality: 50,
+        quality: 100,
         destinationType: Camera.DestinationType.FILE_URI,
         // In this app, dynamically set the picture source, Camera or photo gallery
         sourceType: srcType,
@@ -15371,8 +15366,9 @@ function setOptions(srcType) {
         mediaType: Camera.MediaType.PICTURE,
         allowEdit: true,
         correctOrientation: true,
-        targetHeight : 300,
-        targetWidth : 300,
+        targetHeight : 500,
+        targetWidth : 625,
+        saveToPhotoAlbum: false
           //Corrects Android orientation quirks
     }
     return options;
@@ -15403,7 +15399,7 @@ function displayImage(imageUri) {
     var elem = document.getElementById('image');
     var img = new Image();
         img.onload = function() {
-          cc.drawImage(img,10,10);
+          cc.drawImage(img,0,0,500,500);
         };
     img.src = imageUri;
     
@@ -15411,7 +15407,7 @@ function displayImage(imageUri) {
 
 function openFilePicker(selection) {
 
-    var srcType = Camera.PictureSourceType.SAVEDPHOTOALBUM;
+    var srcType = Camera.PictureSourceType.PHOTOLIBRARY;
     var options = setOptions(srcType);
     // var func = createNewFileEntry;
 
@@ -15437,7 +15433,7 @@ function faceDetect() {
 
 function drawLoop() {
   drawRequest = requestAnimFrame(drawLoop);
-  overlayCC.clearRect(0, 0, 400,400);
+  overlayCC.clearRect(0, 0,700,700);
   if (ctrack.getCurrentPosition()) {
     ctrack.draw(overlay);
   }
