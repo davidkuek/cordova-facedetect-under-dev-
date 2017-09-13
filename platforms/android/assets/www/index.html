@@ -39,17 +39,17 @@
         <div class="app">
             <h1>Apache Cordova</h1>
             <div id="deviceready">
-            <button id="openCamera">Open Camera</button>
-            <button id="openLibrary">Open Library</button>
-            <button id="faceDetect">Face Detect</button>
-            
-            <!-- <img id="imageFile" width="200" height="200"> -->
+            <button id="openCamera">Verify</button>
             <div id="container">
-            <canvas id="image" width="500" height="500"></canvas>
-            <canvas id="overlay" width="500" height="500"></canvas>
+            <canvas id="image" width="200" height="266"></canvas>
+            <canvas id="overlay" width="200" height="266"></canvas>
+            <img id="frame" src="img/logo.png">
             </div>
             </div>
         </div>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript" src="js/webgl-utils.js"></script>
+        <script type="text/javascript" src="js/clmtrackr.js"></script>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
     </body>

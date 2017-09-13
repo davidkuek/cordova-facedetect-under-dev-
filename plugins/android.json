@@ -12,6 +12,9 @@
         },
         "cordova-plugin-camera": {
             "PACKAGE_NAME": "com.example.cordovacamera7"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.example.cordovacamera7"
         }
     },
     "dependent_plugins": {

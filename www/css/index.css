@@ -118,10 +118,20 @@ h1 {
     position: absolute;
     top: 0px;
     left:0px;
+    /*visibility: collapse;*/
 }
 
+/*#image{
+    visibility: collapse;
+}*/
+
 #container{
+    
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 200px;
+    height: 266px;
+}
+
+#frame{
+    visibility: collapse;
 }
