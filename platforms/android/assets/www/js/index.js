@@ -5,22 +5,26 @@
 document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
     document.getElementById('openCamera').addEventListener('click',openCamera,false);
+    // document.getElementById('displayImage').addEventListener('click',displaySavedImage,false);
+    
     // document.getElementById('openLibrary').addEventListener('click',openFilePicker,false);
     // document.getElementById('faceDetect').addEventListener('click',faceDetect,false);    
 }
 
+
+/* Global var */
 var cc = document.getElementById('image').getContext('2d');
 var overlay = document.getElementById('overlay');
 var overlayCC = overlay.getContext('2d');
 var ctrack = new clm.tracker({stopOnConvergence : true});
+var drawRequest;
 var imagePath;
 ctrack.init();
 
 
 
 
-// =========== Cordova Camera function =============
-
+/* Cordova Camera */
 function setOptions(srcType) {
     var options = {
         // Some common settings are 20, 50, and 100
@@ -35,8 +39,8 @@ function setOptions(srcType) {
         targetHeight : 266,
         targetWidth : 200
         
-          //Corrects Android orientation quirks
-    }
+          
+    };
     return options;
 }
 
@@ -45,19 +49,11 @@ function openCamera(selection,canvas) {
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = setOptions(srcType);
     // var func = createNewFileEntry;
-    // alert('Please face the camera');
     navigator.camera.getPicture(function cameraSuccess(imageUri) {
 
-
         displayImage(imageUri);
-        console.log(imageUri);
         faceDetect(imageUri);
-        
-        
-        
 
-        // You may choose to copy the picture, save it somewhere, or upload.
-        // func(imageUri);
     }, function cameraError(error) {
         console.debug("Unable to obtain picture: " + error, "app");
 
@@ -78,14 +74,11 @@ function displayImage(imageUri) {
 }
 
 
-// ================ Handling face detection =============
-
-var drawRequest;
-
+/* Face Detect Function */
 function faceDetect(imageUri) {
   ctrack.start(document.getElementById('image'));
   drawLoop();
-  window.imagePath = imageUri;
+  window.imagePath = imageUri; //declaring a global var.
 }
 
 function drawLoop() {
@@ -96,46 +89,96 @@ function drawLoop() {
   }
 }
 
-// ============== Deleting saved image ===============
 
-
-
+/* Delete saved image  */
 function deleteFile(imagePath){
 
-
-var path = "file:///storage/emulated/0/Android/data/com.example.cordovacamera7/cache/";
-var convertString = String(imagePath);
-var fileName = convertString.slice(73,92);
-alert(fileName);
-
+var fileName = imagePath.substr(imagePath.lastIndexOf("cache/") + 6); //getting file
+var path = imagePath.slice(0,imagePath.lastIndexOf(fileName)); //getting path without filename
 
 window.resolveLocalFileSystemURL(path, function(dir) {
   dir.getFile(fileName, {create:false}, function(fileEntry) {
               fileEntry.remove(function(){
-                alert('file deleted');
-                  // The file has been removed succesfully
+                console.log('file deleted');
+                  
               },function(error){
-                alert('error of' + error);    
-                  // Error deleting the file
+                console.log('error of' + error.code);    
+                  
               },function(){
-                alert('no file exist');
-                 // The file doesn't exist
+                console.log('no file exist');
+                 
               });
   });
 });
 }
 
 
-// ================= Event handler for face detect ========
+/* Move files after camera success */
+function moveFile(imagePath) {
+    window.resolveLocalFileSystemURL(
+          imagePath,
 
+          function(fileEntry){
+                newFileUri  = cordova.file.dataDirectory;
+                oldFileUri  = imagePath;
+                newFileName = oldFileUri.substr(oldFileUri.lastIndexOf("cache/") + 6);
+                
+                window.resolveLocalFileSystemURL(newFileUri,
+                        function(dirEntry) {
+                            // move the file to a new directory and rename it
+                            fileEntry.moveTo(dirEntry, newFileName, successCallback, errorCallback);
+                        },
+                        errorCallback);
+          },
+          errorCallback);
+
+  function successCallback(entry) {
+    console.log("New Path: " + entry.fullPath);
+  }
+
+  function errorCallback(error) {
+    console.log("Error:" + error.code);
+  }   
+
+}
+
+
+
+/* display file from internal data */
+function displaySavedImage(imagePath){
+
+  var path = cordova.file.dataDirectory;
+  var fileName = "1505366034749.jpg"
+
+    window.resolveLocalFileSystemURL(path, function(dir){
+      dir.getFile(fileName, {create:false}, function(fileEntry){
+
+        var elem = document.getElementById('imageFile');
+        elem.src = fileEntry.toURL();
+
+      },function(err){
+        alert('error');
+
+      },function(){
+        alert('not found');
+
+      });
+    });
+}
+
+
+
+
+/* handling face detect event listener from clmtrackr.js */
 document.addEventListener("clmtrackrConverged", function(event) {
   
   var position = ctrack.getCurrentPosition();
   
+
   alert('Face detected');
   console.log(position);
-          // stop drawloop
   cancelRequestAnimFrame(drawRequest);
+  moveFile(imagePath);
   ctrack.reset(overlay);
 }, false);
 
@@ -144,20 +187,21 @@ document.addEventListener("clmtrackrNotFound", function(event) {
     
     var position = ctrack.getCurrentPosition();
     
-    ctrack.stop();
-    alert("Please try again.")
+    ctrack.stop(document.getElementById('image'));
+    cancelRequestAnimFrame(drawRequest);
+    alert("Please try again.");
     console.log(position);
     deleteFile(imagePath);
     ctrack.reset(overlay);
   }, false);
 
 
-        // detect if tracker loses tracking of face
 document.addEventListener("clmtrackrLost", function(event) {
   
   var position = ctrack.getCurrentPosition();
   
-  ctrack.stop();
+  ctrack.stop(document.getElementById('image'));
+  cancelRequestAnimFrame(drawRequest);
   alert("Track Lost.");
   console.log(position);
   deleteFile(imagePath);

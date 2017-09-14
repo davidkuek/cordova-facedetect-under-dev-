@@ -14939,7 +14939,7 @@ var clm = {
 		 */
 		this.getCurrentPosition = function() {
 			if (first) {
-				return currentPositions;
+				return false;
 			} else {
 				return currentPositions;
 			}
